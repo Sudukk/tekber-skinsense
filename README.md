@@ -1,4 +1,4 @@
-# skinsense
+# SkinSense
 
 A new Flutter project.
 
