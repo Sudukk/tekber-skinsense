@@ -1,6 +1,6 @@
 {
-    "name": "skinvision",
-    "short_name": "skinvision",
+    "name": "skinsense",
+    "short_name": "skinsense",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

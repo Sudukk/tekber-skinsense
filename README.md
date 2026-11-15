@@ -1,4 +1,4 @@
-# skinvision
+# skinsense
 
 A new Flutter project.
 

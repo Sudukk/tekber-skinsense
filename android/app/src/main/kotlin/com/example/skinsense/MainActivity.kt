@@ -1,4 +1,4 @@
-package com.example.skinvision
+package com.example.skinsense
 
 import io.flutter.embedding.android.FlutterActivity
 
