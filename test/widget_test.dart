@@ -52,4 +52,21 @@ void main() {
     expect(find.text('Lengkapi Profil'), findsOneWidget);
     expect(find.text('Mulai Pemeriksaan'), findsNothing);
   });
+
+  testWidgets('GuideScreen displays five usage steps', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(412, 915);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(const SkinSenseApp(initialLocation: '/guide'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Lima langkah dari foto sampai hasil.'), findsOneWidget);
+    expect(find.text('Lengkapi profil'), findsOneWidget);
+    expect(find.text('Foto lesi'), findsOneWidget);
+    expect(find.text('Tunggu analisis'), findsOneWidget);
+    expect(find.text('Baca hasil'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('Buka lagi kapan saja'), 200);
+    expect(find.text('Buka lagi kapan saja'), findsOneWidget);
+  });
 }

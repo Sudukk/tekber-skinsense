@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+import 'screens/guide.dart';
 import 'screens/home.dart';
 import 'services.dart';
 import 'theme.dart';
@@ -29,13 +30,7 @@ GoRouter createRouter({String initialLocation = '/home'}) => GoRouter(
                 subtitle: 'Halaman riwayat pemeriksaan akan ditambahkan pada fitur Riwayat.',
               ),
             ),
-            GoRoute(
-              path: '/guide',
-              builder: (_, _) => const _PlaceholderScreen(
-                title: 'Panduan',
-                subtitle: 'Halaman panduan penggunaan aplikasi akan ditambahkan pada fitur Panduan.',
-              ),
-            ),
+            GoRoute(path: '/guide', builder: (_, _) => const GuideScreen()),
             GoRoute(path: '/profile', builder: (_, _) => const _ProfilePlaceholderScreen()),
             GoRoute(
               path: '/process',
