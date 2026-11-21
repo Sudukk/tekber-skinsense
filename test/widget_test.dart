@@ -1,30 +1,55 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
+import 'dart:ui';
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:skinsense/main.dart';
+import 'package:skinsense/services.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('HomeScreen displays complete profile state and nav bar', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(412, 915);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.reset);
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    setLocalProfileForTesting({
+      'full_name': 'Demo',
+      'gender': 'male',
+      'birth_date': '2000-01-01',
+      'phone': '08123456789',
+    });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    await tester.pumpWidget(const SkinSenseApp());
+    await tester.pumpAndSettle();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(find.text('Halo,'), findsOneWidget);
+    expect(find.text('Demo'), findsOneWidget);
+    expect(find.text('Periksa lesi kulit'), findsOneWidget);
+    expect(find.text('Foto dianalisis langsung di ponsel ini.'), findsOneWidget);
+    expect(find.text('Mulai Pemeriksaan'), findsOneWidget);
+    expect(find.text('Agar hasil akurat'), findsOneWidget);
+    expect(find.text('Gunakan cahaya terang tanpa bayangan.'), findsOneWidget);
+    expect(find.text('Dekatkan kamera hingga lesi memenuhi sebagian besar bingkai.'), findsOneWidget);
+    expect(find.text('Tahan ponsel diam sampai gambar tajam.'), findsOneWidget);
+    expect(find.text('Lengkapi Profil'), findsNothing);
+
+    expect(find.text('Periksa'), findsOneWidget);
+    expect(find.text('Riwayat'), findsOneWidget);
+    expect(find.text('Panduan'), findsOneWidget);
+    expect(find.text('Profil'), findsOneWidget);
+  });
+
+  testWidgets('HomeScreen shows Lengkapi Profil when profile is incomplete', (WidgetTester tester) async {
+    setLocalProfileForTesting({
+      'full_name': 'Demo',
+      'gender': '',
+      'birth_date': '',
+      'phone': '',
+    });
+
+    await tester.pumpWidget(const SkinSenseApp());
+    await tester.pumpAndSettle();
+
+    expect(find.text('Profil belum lengkap'), findsOneWidget);
+    expect(find.text('Lengkapi Profil'), findsOneWidget);
+    expect(find.text('Mulai Pemeriksaan'), findsNothing);
   });
 }
