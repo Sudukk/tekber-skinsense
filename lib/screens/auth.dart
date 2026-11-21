@@ -223,3 +223,188 @@ abstract class _AuthState<T extends StatefulWidget> extends State<T> {
         },
       );
 }
+
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends _AuthState<LoginScreen> {
+  Future<void> _submit() async {
+    final normalizedEmail = email.text.trim().toLowerCase();
+    if (!_isValidEmail(normalizedEmail)) return fail('Masukkan alamat email yang valid.');
+    if (password.text.isEmpty) return fail('Password wajib diisi.');
+    await run('Sedang masuk...', 'Login gagal. Periksa email dan password Anda.', () async {
+      await supabase.auth.signInWithPassword(email: normalizedEmail, password: password.text);
+      if (mounted) context.go('/home');
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => _AuthForm(
+        title: 'Masuk',
+        subtitle: 'Lanjutkan pemeriksaan dan lihat riwayat hasil Anda.',
+        fields: [
+          AppField(
+            label: 'Email',
+            controller: email,
+            hint: 'nama@email.com',
+            keyboardType: TextInputType.emailAddress,
+            autofillHints: const [AutofillHints.email],
+          ),
+          AppField(
+            label: 'Password',
+            controller: password,
+            hint: 'Password Anda',
+            obscure: !showPassword,
+            onToggleVisible: toggleVisible,
+            autofillHints: const [AutofillHints.password],
+          ),
+        ],
+        submitTitle: 'Masuk',
+        loading: loading,
+        onSubmit: _submit,
+        onOAuth: oauth,
+        message: message,
+        error: error,
+        footerText: 'Belum punya akun?',
+        footerLink: 'Daftar',
+        footerRoute: '/register',
+      );
+}
+
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
+  @override
+  State<RegisterScreen> createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends _AuthState<RegisterScreen> {
+  final confirm = TextEditingController();
+
+  @override
+  void dispose() {
+    confirm.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    final normalizedEmail = email.text.trim().toLowerCase();
+    if (!_isValidEmail(normalizedEmail)) return fail('Masukkan alamat email yang valid.');
+    if (password.text.length < 6) return fail('Password minimal 6 karakter.');
+    if (password.text != confirm.text) return fail('Konfirmasi password tidak sama.');
+    await run('Mendaftarkan akun...', 'Registrasi gagal. Silakan coba lagi.', () async {
+      final result = await supabase.auth.signUp(
+        email: normalizedEmail,
+        password: password.text,
+        data: {'email': normalizedEmail},
+      );
+      if (!mounted) return;
+      if (result.user != null && result.session == null) {
+        await showAlert(context, 'Registrasi berhasil', 'Periksa email untuk mengonfirmasi akun sebelum masuk.');
+        if (mounted) context.pushReplacement('/login');
+        return;
+      }
+      context.go('/home');
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => _AuthForm(
+        title: 'Buat akun',
+        subtitle: 'Hasil pemeriksaan tersimpan di akun ini.',
+        fields: [
+          AppField(
+            label: 'Email',
+            controller: email,
+            hint: 'nama@email.com',
+            keyboardType: TextInputType.emailAddress,
+            autofillHints: const [AutofillHints.email],
+          ),
+          AppField(
+            label: 'Password',
+            controller: password,
+            hint: 'Minimal 6 karakter',
+            obscure: !showPassword,
+            onToggleVisible: toggleVisible,
+            autofillHints: const [AutofillHints.newPassword],
+          ),
+          AppField(
+            label: 'Ulangi password',
+            controller: confirm,
+            hint: 'Ketik ulang password',
+            obscure: !showPassword,
+            onToggleVisible: toggleVisible,
+            autofillHints: const [AutofillHints.newPassword],
+          ),
+        ],
+        submitTitle: 'Daftar',
+        loading: loading,
+        onSubmit: _submit,
+        onOAuth: oauth,
+        message: message,
+        error: error,
+        footerText: 'Sudah punya akun?',
+        footerLink: 'Masuk',
+        footerRoute: '/login',
+      );
+}
+
+class AuthCallbackScreen extends StatefulWidget {
+  const AuthCallbackScreen({super.key, required this.params});
+  final Map<String, String> params;
+  @override
+  State<AuthCallbackScreen> createState() => _AuthCallbackScreenState();
+}
+
+class _AuthCallbackScreenState extends State<AuthCallbackScreen> {
+  StreamSubscription<AuthState>? _subscription;
+  Timer? _timeout;
+  String? _error;
+
+  bool get _hasCallbackData =>
+      ['code', 'error', 'error_description'].any((key) => widget.params[key]?.isNotEmpty ?? false);
+
+  @override
+  void initState() {
+    super.initState();
+    final providerError = widget.params['error_description'] ?? widget.params['error'];
+    if (providerError != null) {
+      _error = getSafeErrorMessage(Exception(providerError), 'Login OAuth gagal. Silakan coba lagi.', auth: true);
+    } else if (supabase.auth.currentSession != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _done());
+    } else if (_hasCallbackData) {
+      _subscription = supabase.auth.onAuthStateChange.listen((state) {
+        if (state.session != null) _done();
+      });
+      _timeout = Timer(const Duration(seconds: 20), () {
+        if (mounted) setState(() => _error = 'Login OAuth gagal. Silakan coba lagi.');
+      });
+    }
+  }
+
+  void _done() {
+    if (mounted) context.go('/home');
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    _timeout?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        body: SafeArea(
+          child: _error != null || !_hasCallbackData
+              ? StateMessage(
+                  title: _error ?? 'Data login tidak ditemukan. Kembali ke halaman login.',
+                  actionTitle: 'Kembali ke Login',
+                  onAction: () => context.go('/login'),
+                )
+              : const StateMessage(title: 'Menyelesaikan login...', loading: true),
+        ),
+      );
+}
