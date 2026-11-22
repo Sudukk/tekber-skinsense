@@ -1,7 +1,156 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
+
+import 'logic.dart';
 import 'theme.dart';
 
-// GenderField dan BirthDateField memakai AppColors dan AppText dari Issue #3 (PR #10).
+enum ButtonVariant { primary, secondary, quiet, danger }
+
+class AppButton extends StatelessWidget {
+  const AppButton({
+    super.key,
+    required this.title,
+    required this.onPressed,
+    this.variant = ButtonVariant.primary,
+    this.disabled = false,
+    this.icon,
+  });
+
+  final String title;
+  final VoidCallback? onPressed;
+  final ButtonVariant variant;
+  final bool disabled;
+  final Widget? icon;
+
+  @override
+  Widget build(BuildContext context) {
+    final (background, foreground, border) = switch (variant) {
+      ButtonVariant.primary => (AppColors.teal, AppColors.paper, null),
+      ButtonVariant.secondary => (AppColors.paper, AppColors.ink, AppColors.ink),
+      ButtonVariant.quiet => (Colors.transparent, AppColors.tealDeep, null),
+      ButtonVariant.danger => (AppColors.paper, AppColors.danger, AppColors.line),
+    };
+    final text = Text(
+      title,
+      textAlign: TextAlign.center,
+      style: AppText.button.copyWith(color: foreground),
+    );
+
+    return Opacity(
+      opacity: disabled ? 0.5 : 1,
+      child: Material(
+        color: background,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+          side: border == null ? BorderSide.none : BorderSide(color: border, width: 1.5),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: disabled ? null : onPressed,
+          splashColor: variant == ButtonVariant.primary ? AppColors.tealDeep : AppColors.tealWash,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 52),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 20),
+              child: icon == null
+                  ? Center(child: text)
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [icon!, const SizedBox(width: 10), Flexible(child: text)],
+                    ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+InputDecoration _boxDecoration({String? hint, Widget? suffix}) => InputDecoration(
+      hintText: hint,
+      hintStyle: AppText.input.copyWith(color: AppColors.inkFaint),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 15),
+      suffixIcon: suffix,
+      filled: true,
+      fillColor: AppColors.paper,
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.line, width: 1.5),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.teal, width: 1.5),
+      ),
+    );
+
+class LabeledField extends StatelessWidget {
+  const LabeledField({super.key, required this.label, required this.child});
+  final String label;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.only(bottom: 18),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(label, style: AppText.label),
+            const SizedBox(height: 8),
+            child,
+          ],
+        ),
+      );
+}
+
+class AppField extends StatelessWidget {
+  const AppField({
+    super.key,
+    required this.label,
+    required this.controller,
+    this.hint,
+    this.keyboardType,
+    this.autofillHints,
+    this.obscure = false,
+    this.onToggleVisible,
+    this.capitalization = TextCapitalization.none,
+  });
+
+  final String label;
+  final TextEditingController controller;
+  final String? hint;
+  final TextInputType? keyboardType;
+  final Iterable<String>? autofillHints;
+  final bool obscure;
+  final VoidCallback? onToggleVisible;
+  final TextCapitalization capitalization;
+
+  @override
+  Widget build(BuildContext context) => LabeledField(
+        label: label,
+        child: TextField(
+          controller: controller,
+          keyboardType: keyboardType,
+          autofillHints: autofillHints,
+          obscureText: obscure,
+          autocorrect: false,
+          enableSuggestions: onToggleVisible == null && keyboardType != TextInputType.emailAddress,
+          textCapitalization: capitalization,
+          style: AppText.input,
+          decoration: _boxDecoration(
+            hint: hint,
+            suffix: onToggleVisible == null
+                ? null
+                : IconButton(
+                    onPressed: onToggleVisible,
+                    tooltip: obscure ? 'Tampilkan password' : 'Sembunyikan password',
+                    icon: Icon(obscure ? LucideIcons.eyeOff : LucideIcons.eye,
+                        size: 20, color: AppColors.inkMuted),
+                  ),
+          ),
+        ),
+      );
+}
+
 class GenderField extends StatelessWidget {
   const GenderField({super.key, required this.value, required this.onChanged});
   final String value;
