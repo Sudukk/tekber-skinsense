@@ -8,6 +8,8 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'screens/auth.dart';
+import 'screens/guide.dart';
+import 'screens/home.dart';
 import 'screens/profile.dart';
 import 'services.dart';
 import 'theme.dart';
@@ -55,12 +57,12 @@ final _router = GoRouter(
     ShellRoute(
       builder: (context, state, child) => _NavShell(location: state.uri.path, child: child),
       routes: [
-        // shortcut: Periksa/Riwayat/Panduan are placeholders, replace with real screens from issue #8 and later.
-        GoRoute(path: '/home', builder: (_, _) => const _Placeholder('Periksa')),
+        GoRoute(path: '/home', builder: (_, _) => const HomeScreen()),
         GoRoute(path: '/history', builder: (_, _) => const _Placeholder('Riwayat')),
-        GoRoute(path: '/guide', builder: (_, _) => const _Placeholder('Panduan')),
+        GoRoute(path: '/guide', builder: (_, _) => const GuideScreen()),
         GoRoute(path: '/profile', builder: (_, _) => const ProfileScreen()),
         GoRoute(path: '/edit-profile', builder: (_, _) => const EditProfileScreen()),
+        GoRoute(path: '/process', builder: (_, _) => const _Placeholder('Pemindaian Lesi')),
       ],
     ),
   ],
