@@ -4,6 +4,8 @@ const supabaseUrl = String.fromEnvironment('SUPABASE_URL');
 const _anonKey = String.fromEnvironment('SUPABASE_ANONYMOUS_KEY');
 const supabaseKey = _anonKey != '' ? _anonKey : String.fromEnvironment('SUPABASE_PUBLISHABLE_KEY');
 const isSupabaseConfigured = supabaseUrl != '' && supabaseKey != '';
+const oauthRedirectUrl = 'melanosense://auth/callback';
+const showSocialAuth = false;
 
 SupabaseClient get supabase => Supabase.instance.client;
 
