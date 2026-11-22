@@ -193,14 +193,28 @@ bool isValidPhone(String? value) {
 }
 
 bool isValidBirthDate(String? value) {
-  final match = RegExp(r'^(\d{4})-(\d{2})-(\d{2})$').firstMatch(normalizeText(value));
+  final match = RegExp(r'^(\d{4})-(\d{2})-(\d{2})$')
+      .firstMatch(normalizeText(value));
   if (match == null) return false;
   final year = int.parse(match[1]!);
   final month = int.parse(match[2]!);
   final day = int.parse(match[3]!);
   if (year < 1 || month < 1 || month > 12 || day < 1) return false;
   final leapYear = year % 4 == 0 && (year % 100 != 0 || year % 400 == 0);
-  final daysInMonth = [31, leapYear ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+  final daysInMonth = [
+    31,
+    leapYear ? 29 : 28,
+    31,
+    30,
+    31,
+    30,
+    31,
+    31,
+    30,
+    31,
+    30,
+    31,
+  ];
   return day <= daysInMonth[month - 1];
 }
 
@@ -212,8 +226,18 @@ bool isProfileComplete(Map<String, dynamic>? profile) =>
     normalizeText(profile['gender'] as String?).isNotEmpty;
 
 const _months = [
-  'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-  'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember',
+  'Januari',
+  'Februari',
+  'Maret',
+  'April',
+  'Mei',
+  'Juni',
+  'Juli',
+  'Agustus',
+  'September',
+  'Oktober',
+  'November',
+  'Desember',
 ];
 
 DateTime? parseCalendarDate(String value) {
@@ -235,19 +259,36 @@ String formatBirthDate(String value) {
   return '${parts[2]} ${_months[parts[1] - 1]} ${parts[0].toString().padLeft(4, '0')}';
 }
 
-String getSafeErrorMessage(Object? error, String fallback, {bool auth = false}) {
+String getSafeErrorMessage(
+  Object? error,
+  String fallback, {
+  bool auth = false,
+}) {
   final message = _errorText(error).toLowerCase();
 
-  if (const ['network', 'fetch', 'socket', 'host lookup', 'connection']
-      .any(message.contains)) {
+  if (const [
+    'network',
+    'fetch',
+    'socket',
+    'host lookup',
+    'connection',
+  ].any(message.contains)) {
     return 'Koneksi bermasalah. Periksa internet lalu coba lagi.';
   }
 
   if (auth) {
-    if (message.contains('invalid login credentials')) return 'Email atau password salah.';
-    if (message.contains('email not confirmed')) return 'Email belum dikonfirmasi. Periksa inbox Anda.';
-    if (message.contains('user already registered')) return 'Email tersebut sudah terdaftar.';
-    if (message.contains('password')) return 'Password tidak memenuhi persyaratan.';
+    if (message.contains('invalid login credentials')) {
+      return 'Email atau password salah.';
+    }
+    if (message.contains('email not confirmed')) {
+      return 'Email belum dikonfirmasi. Periksa inbox Anda.';
+    }
+    if (message.contains('user already registered')) {
+      return 'Email tersebut sudah terdaftar.';
+    }
+    if (message.contains('password')) {
+      return 'Password tidak memenuhi persyaratan.';
+    }
   }
 
   return fallback;
