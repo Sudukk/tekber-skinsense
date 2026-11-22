@@ -241,6 +241,74 @@ class BirthDateField extends StatelessWidget {
   }
 }
 
+class Viewfinder extends StatelessWidget {
+  const Viewfinder({super.key, required this.child, this.color = AppColors.teal, this.background = AppColors.skin});
+  final Widget child;
+  final Color color;
+  final Color background;
+
+  @override
+  Widget build(BuildContext context) => Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 400),
+          child: AspectRatio(
+            aspectRatio: 1,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(24),
+              child: ColoredBox(
+                color: background,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    child,
+                    IgnorePointer(child: CustomPaint(painter: _CornersPainter(color))),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+}
+
+class _CornersPainter extends CustomPainter {
+  _CornersPainter(this.color);
+  final Color color;
+
+  static const _arm = 28.0;
+  static const _inset = 10.0;
+  static const _stroke = 4.0;
+  static const _radius = 6.0;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = _stroke;
+    const o = _inset + _stroke / 2;
+    const r = _radius - _stroke / 2;
+    const l = _arm - _stroke / 2;
+
+    Path corner() => Path()
+      ..moveTo(o, o + l)
+      ..lineTo(o, o + r)
+      ..arcToPoint(const Offset(o + r, o), radius: const Radius.circular(r))
+      ..lineTo(o + l, o);
+
+    for (final (sx, sy) in const [(1.0, 1.0), (-1.0, 1.0), (1.0, -1.0), (-1.0, -1.0)]) {
+      canvas.save();
+      canvas.translate(sx < 0 ? size.width : 0, sy < 0 ? size.height : 0);
+      canvas.scale(sx, sy);
+      canvas.drawPath(corner(), paint);
+      canvas.restore();
+    }
+  }
+
+  @override
+  bool shouldRepaint(_CornersPainter oldDelegate) => oldDelegate.color != color;
+}
+
 class FormScreen extends StatelessWidget {
   const FormScreen({super.key, required this.children, this.center = false, this.bottomInset = true});
   final List<Widget> children;

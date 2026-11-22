@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:skinsense/screens/profile.dart';
+import 'theme.dart';
 
 void main() async {
   runApp(const MyApp());
@@ -11,7 +12,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: const Scaffold(body: ProfileScreen(),)
+      title: 'SkinSense',
+      theme: appTheme,
+      home: const Scaffold(body: ProfileScreen()),
     );
   }
 }
