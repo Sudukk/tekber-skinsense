@@ -31,7 +31,10 @@ dependencies:
   cupertino_icons: ^2.0.0
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
   go_router: ^18.1.4
+  intl: ^0.20.3
   lucide_icons_flutter: ^4.0.3
   supabase_flutter: ^2.18.3
 
@@ -56,6 +59,8 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+  assets:
+    - assets/images/
 
   # To add assets to your application, add an assets section, like this:
   # assets:
