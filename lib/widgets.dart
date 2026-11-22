@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'theme.dart';
 
+// GenderField dan BirthDateField memakai AppColors dan AppText dari Issue #3 (PR #10).
 class GenderField extends StatelessWidget {
   const GenderField({super.key, required this.value, required this.onChanged});
   final String value;
