@@ -57,7 +57,6 @@ final _router = GoRouter(
     ShellRoute(
       builder: (context, state, child) => _NavShell(location: state.uri.path, child: child),
       routes: [
-        // shortcut: Riwayat/Proses are placeholders until their features are merged.
         GoRoute(path: '/home', builder: (_, _) => const HomeScreen()),
         GoRoute(path: '/history', builder: (_, _) => const _Placeholder('Riwayat')),
         GoRoute(path: '/guide', builder: (_, _) => const GuideScreen()),
