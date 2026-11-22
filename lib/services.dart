@@ -1,19 +1,29 @@
-// Temporary local profile stub matching ../skinsense/lib/services.dart
-// so HomeScreen works standalone on feat-home-page before Supabase/auth is merged.
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-Map<String, dynamic> _localProfile = {
-  'full_name': 'Demo',
-  'gender': 'male',
-  'birth_date': '2000-01-01',
-  'phone': '08123456789',
-};
+const supabaseUrl = String.fromEnvironment('SUPABASE_URL');
+const _anonKey = String.fromEnvironment('SUPABASE_ANONYMOUS_KEY');
+const supabaseKey = _anonKey != '' ? _anonKey : String.fromEnvironment('SUPABASE_PUBLISHABLE_KEY');
+const isSupabaseConfigured = supabaseUrl != '' && supabaseKey != '';
+const oauthRedirectUrl = 'melanosense://auth/callback';
+const showSocialAuth = false;
 
-void setLocalProfileForTesting(Map<String, dynamic> profile) {
-  _localProfile = Map<String, dynamic>.from(profile);
+SupabaseClient get supabase => Supabase.instance.client;
+
+void ensureSupabaseConfigured() {
+  if (!isSupabaseConfigured) {
+    throw Exception('Supabase belum dikonfigurasi. Isi konfigurasi Supabase pada environment aplikasi.');
+  }
+}
+
+User _requireUser() {
+  final user = supabase.auth.currentUser;
+  if (user == null) throw Exception('User belum login.');
+  return user;
 }
 
 Future<Map<String, dynamic>> getCurrentUserProfile() async {
-  return Map<String, dynamic>.from(_localProfile);
+  final user = _requireUser();
+  return supabase.from('profiles').select().eq('id', user.id).single();
 }
 
 Future<void> updateCurrentUserProfile({
@@ -22,10 +32,18 @@ Future<void> updateCurrentUserProfile({
   required String birthDate,
   required String phone,
 }) async {
-  _localProfile = {
-    'full_name': fullName,
-    'gender': gender,
-    'birth_date': birthDate,
-    'phone': phone,
-  };
+  final user = _requireUser();
+  await supabase
+      .from('profiles')
+      .update({
+        'full_name': fullName,
+        'gender': gender,
+        'birth_date': birthDate,
+        'phone': phone,
+        'updated_at': DateTime.now().toUtc().toIso8601String(),
+      })
+      .eq('id', user.id)
+      .select()
+      .single();
 }
+
