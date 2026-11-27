@@ -66,5 +66,9 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>SkinSense memerlukan kamera untuk memotret lesi kulit.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>SkinSense memerlukan akses galeri untuk memilih foto lesi kulit.</string>
 </dict>
 </plist>
