@@ -10,6 +10,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'screens/auth.dart';
 import 'screens/guide.dart';
 import 'screens/home.dart';
+import 'screens/process.dart';
 import 'screens/profile.dart';
 import 'services.dart';
 import 'theme.dart';
@@ -59,10 +60,11 @@ final _router = GoRouter(
       routes: [
         GoRoute(path: '/home', builder: (_, _) => const HomeScreen()),
         GoRoute(path: '/history', builder: (_, _) => const _Placeholder('Riwayat')),
+        GoRoute(path: '/history/:id', builder: (_, _) => const _Placeholder('Hasil Pemeriksaan')),
         GoRoute(path: '/guide', builder: (_, _) => const GuideScreen()),
         GoRoute(path: '/profile', builder: (_, _) => const ProfileScreen()),
         GoRoute(path: '/edit-profile', builder: (_, _) => const EditProfileScreen()),
-        GoRoute(path: '/process', builder: (_, _) => const _Placeholder('Pemindaian Lesi')),
+        GoRoute(path: '/process', builder: (_, _) => const ProcessScreen()),
       ],
     ),
   ],
